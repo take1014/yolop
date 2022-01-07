@@ -10,23 +10,28 @@ def draw_lane_line(img, points):
     print("points count:{}".format(len(points)))
     if len(points) > 0:
         for ps in points:
-            ps = np.array(ps, dtype=np.int32)
-            for i in range(len(ps)):
-                if i+1 < len(ps):
-                    p1 = ps[i]
-                    p2 = ps[i+1]
-                    print(p1, p2)
-                    cv2.line(img, p1, p2, color=(0, 255, 0), thickness=2)
+            poly = np.array(ps["poly"], dtype=np.int32)
+            lanedir = ps["laneDir"]
+            for i in range(len(poly)):
+                if i+1 < len(poly):
+                    p1 = poly[i]
+                    p2 = poly[i+1]
+                    # print(p1, p2, lanetype)
+                    if lanedir == "vertical":
+                        # vertical
+                        cv2.line(img, p1, p2, color=(255, 0, 0), thickness=2)
+                    else:
+                        # parallel
+                        cv2.line(img, p1, p2, color=(0, 255, 0), thickness=2)
+                    cv2.circle(img, p1, 3, color=(0, 0, 255), thickness=2)
+                    cv2.circle(img, p2, 3, color=(0, 0, 255), thickness=2)
     return img
 
 if __name__ == "__main__":
     lane_manage = LaneDataManager("/Users/take/fun/dataset/bdd100k/labels/lane/polygons/lane_train.json")
 
-    print(lane_manage.get_data_len())
-    print(lane_manage.get_lane_points(1))
-
     for i in range(lane_manage.get_data_len()):
-        points, image_name = lane_manage.get_lane_points(i)
+        points, image_name = lane_manage.get_points(i)
         image_file_path = os.path.join("/Users/take/fun/dataset/bdd100k/images/100k/train", image_name)
         img = cv2.imread(image_file_path)
         img = draw_lane_line(img, points)
