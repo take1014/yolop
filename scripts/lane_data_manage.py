@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+#-*- coding:utf-8 -*-
+
 import os
 import json
 import cv2
@@ -43,24 +46,28 @@ class LaneDataManager(object):
 
 if __name__ == "__main__":
     lane_manage_train = LaneDataManager("/Users/take/fun/dataset/bdd100k/labels/lane/polygons/lane_train.json")
-    lane_manage_val = LaneDataManager("/Users/take/fun/dataset/bdd100k/labels/lane/polygons/lane_val.json")
+    lane_manage_val   = LaneDataManager("/Users/take/fun/dataset/bdd100k/labels/lane/polygons/lane_val.json")
 
-    category_hist = {"road curb":0, "single white":0, "double white":0, "single yellow":0, "double yellow":0, "single other":0, "double other":0, "crosswalk":0}
+    # calc histogram
+    def calc_hist(manage, category_hist):
+        for i in range(manage.get_data_len()):
+            category = manage.get_category(i)
+            for cat in category:
+                category_hist[cat] += 1
+        return category_hist
+
+    category_hist = { "road curb":0, "single white":0, "double white":0, "single yellow":0,
+                      "double yellow":0, "single other":0, "double other":0, "crosswalk":0 }
+    # train data
     print("train data count:{}".format(lane_manage_train.get_data_len()))
-    for i in range(lane_manage_train.get_data_len()):
-        category = lane_manage_train.get_category(i)
-        for cat in category:
-            category_hist[cat] += 1
+    category_hist = calc_hist(lane_manage_train, category_hist)
 
-    print(category_hist)
-
+    # validation data
     print("val data count:{}".format(lane_manage_val.get_data_len()))
-    for i in range(lane_manage_val.get_data_len()):
-        category = lane_manage_val.get_category(i)
-        for cat in category:
-            category_hist[cat] += 1
+    category_hist = calc_hist(lane_manage_val, category_hist)
+
     # show histogram
     import matplotlib.pyplot as plt
-    x = [1,2,3,4,5,6,7,8]
+    x = [i for i in range(len(category_hist))]
     plt.bar(x, category_hist.values(), tick_label=list(category_hist.keys()))
     plt.show()
