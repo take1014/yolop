@@ -1,45 +1,35 @@
 #!/usr/bin/env python3
 #-*- coding:utf-8 -*-
 import os
-import pickle
+import json
 import cv2
-import glob
+import numpy as np
+from lane_data_manage import LaneDataManager
 
-def create_lane_json():
-    image_path_list = glob.glob("/Users/take/fun/dataset/bdd100k/labels/lane/masks/train/*.png")
-
-    if os.path.exists("./lane_ij.json"):
-        os.remove("./lane_ij.json")
-
-    f = open("./lane_ij.json", mode="w")
-
-    debug_cnt = 0
-    for image_path in image_path_list:
-        img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-        j_size = img.shape[0]
-        i_size = img.shape[1]
-
-        # print("height:{}, width:{}".format(j_size, i_size))
-        print(image_path)
-
-        ij_dic = {"lane":[], "image":os.path.basename(image_path)}
-        for j in range(j_size):
-            for i in range(i_size):
-                pix = img[j, i]
-                if pix < 255:
-                    ij_dic["lane"].append([j, i])
-        f.write(str(ij_dic).replace("'", '"') + "\n")
-        debug_cnt += 1
-        if debug_cnt > 5:
-            break
-    f.close()
+def draw_lane_line(img, points):
+    print("points count:{}".format(len(points)))
+    if len(points) > 0:
+        for ps in points:
+            ps = np.array(ps, dtype=np.int32)
+            for i in range(len(ps)):
+                if i+1 < len(ps):
+                    p1 = ps[i]
+                    p2 = ps[i+1]
+                    print(p1, p2)
+                    cv2.line(img, p1, p2, color=(0, 255, 0), thickness=2)
+    return img
 
 if __name__ == "__main__":
-    create_lane_json()
+    lane_manage = LaneDataManager("/Users/take/fun/dataset/bdd100k/labels/lane/polygons/lane_train.json")
 
-    f = open("./lane_ij.json", "r")
-    for l in f:
-        print(l)
+    print(lane_manage.get_data_len())
+    print(lane_manage.get_lane_points(1))
 
-
-
+    for i in range(lane_manage.get_data_len()):
+        points, image_name = lane_manage.get_lane_points(i)
+        image_file_path = os.path.join("/Users/take/fun/dataset/bdd100k/images/100k/train", image_name)
+        img = cv2.imread(image_file_path)
+        img = draw_lane_line(img, points)
+        cv2.imshow("image", img)
+        cv2.waitKey(1000)
+        cv2.destroyAllWindows()
