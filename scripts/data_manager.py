@@ -71,6 +71,12 @@ class LaneDataManager(object):
 
 
 def create_lane_json():
+
+    if not os.path.exists("/Users/take/fun/dataset/bdd100k/json/lane"):
+        os.mkdir("/Users/take/fun/dataset/bdd100k/json/lane")
+        os.mkdir("/Users/take/fun/dataset/bdd100k/json/lane/train")
+        os.mkdir("/Users/take/fun/dataset/bdd100k/json/lane/val")
+
     lane_manage_train = LaneDataManager("/Users/take/fun/dataset/bdd100k/labels/lane/polygons/lane_train.json")
     for i in range(lane_manage_train.get_data_len()):
         points, name = lane_manage_train.get_points(i)
@@ -90,6 +96,12 @@ def create_lane_json():
             f.write(str(dict_info).replace("'",'"'))
 
 def create_bbox_json():
+
+    if not os.path.exists("/Users/take/fun/dataset/bdd100k/json/bbox"):
+        os.mkdir("/Users/take/fun/dataset/bdd100k/json/bbox")
+        os.mkdir("/Users/take/fun/dataset/bdd100k/json/bbox/train")
+        os.mkdir("/Users/take/fun/dataset/bdd100k/json/bbox/val")
+
     bbox_manage_train = BBoxDataManager("/Users/take/fun/dataset/bdd100k/labels/det_20/det_train.json")
     for i in range(bbox_manage_train.get_data_len()):
         bboxs, name = bbox_manage_train.get_bboxs(i)
