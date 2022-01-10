@@ -4,7 +4,7 @@ import os
 import json
 import cv2
 import numpy as np
-from lane_data_manage import LaneDataManager
+from data_manager import LaneDataManager
 
 def draw_lane_line(img, points):
     print("points count:{}".format(len(points)))
@@ -34,6 +34,7 @@ if __name__ == "__main__":
         points, image_name = lane_manage.get_points(i)
         image_file_path = os.path.join("/Users/take/fun/dataset/bdd100k/images/100k/train", image_name)
         img = cv2.imread(image_file_path)
+        print(img.shape[0], img.shape[1])
         img = draw_lane_line(img, points)
         cv2.imshow("image", img)
         cv2.waitKey(1000)
