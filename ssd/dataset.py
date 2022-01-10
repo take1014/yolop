@@ -12,8 +12,11 @@ class DataTransform():
     def __init__(self, input_size, color_mean):
         self.data_transform = {
             "train":Compose([
-                ConvertFromInts(), ToAbsoluteCoords(), PhotometricDistort(), Expand(color_mean),
-                RandomSampleCrop(), RandomMirror(), ToPercentCoords(), Resize(input_size), SubtractMeans(color_mean)
+                ConvertFromInts(), ToAbsoluteCoords(),
+                PhotometricDistort(), Expand(color_mean),
+                RandomSampleCrop(), RandomMirror(),
+                ToPercentCoords(), Resize(input_size),
+                SubtractMeans(color_mean)
             ]),
             "val":Compose([
                 ConvertFromInts(),
@@ -49,7 +52,6 @@ class SSDDataset(data.Dataset):
                                       (bbox[3] / height), 1]) # label_idx car==1
 
                     boxes = np.array(boxes, dtype=np.float32)
-
                     if self.transform:
                         img, _boxes, labels = self.transform(img, self.phase, boxes[:, :4], boxes[:, 4])
                         gt = np.hstack((_boxes, np.expand_dims(labels, axis=1)))
@@ -57,8 +59,10 @@ class SSDDataset(data.Dataset):
                         gt = boxes
                 else:
                     gt = np.empty(0, dtype=np.float32)
+
                 img = torch.from_numpy(img[:,:,(2, 1, 0)]).permute(2, 0, 1) # convert BGR->RGB and (H, W, C) to (C, H, W)
                 return img, gt
+
 def cusdom_collate_fn(batch):
     targets = []
     imgs = []
