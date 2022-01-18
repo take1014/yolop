@@ -93,14 +93,15 @@ class DBox(object):
         mean = []
         for k, f in enumerate(self.feature_maps):
             s_k = self.min_sizes[k]/self.image_size
-            f_k = self.image_size / self.steps[k]
+            l_k = self.max_sizes[k]/self.image_size
             for i, j in product(range(f), repeat=2):
-                cx = (j + 0.5) / f_k
-                cy = (i + 0.5) / f_k
+                # (j + 0.5) * self.steps[k] -> real DBox position in image.
+                cx = ((j + 0.5) * self.steps[k]) / self.image_size
+                cy = ((i + 0.5) * self.steps[k]) / self.image_size
 
                 mean += [cx, cy, s_k, s_k]
 
-                s_k_prime = sqrt(s_k * (self.max_sizes[k]/self.image_size))
+                s_k_prime = sqrt(s_k * l_k)
                 mean += [cx, cy, s_k_prime, s_k_prime]
 
                 for ar in self.aspect_ratios[k]:
@@ -141,4 +142,3 @@ if __name__ == "__main__":
     dbox = DBox(ssd_cfg)
     dbox_list = dbox.make_dbox_list()
     print(pd.DataFrame(dbox_list.numpy()))
-
